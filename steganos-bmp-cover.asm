@@ -13,11 +13,11 @@ LF                  equ 10
 NULL                equ 0
 STR_MAX_SIZE        equ 1024    ; 1 KiB
 BMP_MAX_SIZE        equ 409600  ; 400 KiB
-;; constantes ;;
+;; constants ;;
 REQUIRED_PARAM      equ 5       ; 5 params
 ROTATE_FACTOR_MIN   equ '0'     ; 48
 ROTATE_FACTOR_MAX   equ '7'     ; 55
-;; mensagens de erro ;;
+;; error messages ;;
 errMsgNumberOfParams db "Error: incorret number of parameters.", LF, NULL
 errMsgNumberOfRotates db "Error: the number of rotates must be in 0-7 range.", LF, NULL
 
@@ -43,13 +43,13 @@ _start:
     call ascii2Natural          ; update rax with the decimal representation of "3"
     push rax                    ; push number of rotations
 
-    ;; leitura de txt ;;
+    ;; read txt/src data ;;
     mov rdi, [rbp]              ; put address in memory for file name
     mov rsi, txt_buffer         ; put buffer address in rsi
     call readMessageFile
     push rax                    ; push number of bytes written to the buffer (txt content)
     
-    ;; encriptar txt ;;
+    ;; cipher src data ;;
     mov rdi, txt_buffer         ; put file content address in RDI
     mov byte [rdi + rax], 0     ; add NULL to end of string
     pop rdx                     ; retrieve number of bytes from string

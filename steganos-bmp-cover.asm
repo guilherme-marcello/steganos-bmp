@@ -1,6 +1,6 @@
 ; <--- steganos-bmp-cover --->
 ; Program that ciphers messages and hides them inside an image
-; - example of usage: ./steganos-bmp-cover my_message 3 img/snail.bmp snail_with_message.bmp
+; - example of usage: ./steganos-bmp-cover samples/message 3 samples/snail.bmp snail_with_message.bmp
 ; - out: BMP Image | snail_with_message.bmp
 
 extern terminate, readMessageFile, printStrLn, readImageFile, writeImageFile

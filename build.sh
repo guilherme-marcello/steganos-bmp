@@ -13,7 +13,9 @@ number=`echo "\033[33m"`
 printf "${yellow}[*][steganos-bmp-cover] Compiling and linking....${blue_menu}\n"
 nasm -f elf64 -F dwarf steganos-bmp-cover.asm
 nasm -f elf64 -F dwarf util/IOUtil.asm
-ld steganos-bmp-cover.o util/IOUtil.o -o steganos-bmp-cover
+nasm -f elf64 -F dwarf util/ArgsUtil.asm
+nasm -f elf64 -F dwarf util/NumericUtil.asm
+ld steganos-bmp-cover.o util/IOUtil.o util/ArgsUtil.o util/NumericUtil.o -o steganos-bmp-cover
 printf "${green}[+] Done.\n"
 
 printf "${cyan}[i] Useful debug commands: \n" 

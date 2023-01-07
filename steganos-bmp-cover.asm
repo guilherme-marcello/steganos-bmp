@@ -3,24 +3,17 @@
 ; - example of usage: ./steganos-bmp-cover samples/message 3 samples/snail.bmp snail_with_message.bmp
 ; - out: BMP Image | snail_with_message.bmp
 
-extern terminate, readMessageFile, printStrLn, readImageFile, writeImageFile
+extern terminate, readMessageFile, printStrLn, readImageFile, writeImageFile, verifyArgs, ascii2Natural
 
 ;********************************************************************
 section .data
 ;********************************************************************
 ;; handy settings ;;
-LF                  equ 10
 NULL                equ 0
 STR_MAX_SIZE        equ 1024    ; 1 KiB
 BMP_MAX_SIZE        equ 409600  ; 400 KiB
 ;; constants ;;
 REQUIRED_PARAM      equ 5       ; 5 params
-ROTATE_FACTOR_MIN   equ '0'     ; 48
-ROTATE_FACTOR_MAX   equ '7'     ; 55
-;; error messages ;;
-errMsgNumberOfParams db "Error: incorret number of parameters.", LF, NULL
-errMsgNumberOfRotates db "Error: the number of rotates must be in 0-7 range.", LF, NULL
-
 
 ;********************************************************************
 section .bss
@@ -35,6 +28,7 @@ section .text
 global _start
 _start:
     ;; check parameters ;;
+    mov rdx, REQUIRED_PARAM     ; set rdx to number of required params
     call verifyArgs             ; check number of arguments passed
     lea rbp, [rsp + 16]         ; point rbp to the first argument of the executed command 
 
@@ -123,7 +117,6 @@ concealCharDone:
 concealDone:
     ret
 
-
 ;--------------------------------------------------------------------
 ; encryptString
 ; description: Rotate right a string in memory
@@ -142,49 +135,3 @@ encryptString:
     jmp encryptString           ; back to encryptString
 encryptionDone:
     ret 
-
-
-;--------------------------------------------------------------------
-; verifyArgs
-; description: Check number of parameters passed to the program
-; params: none
-; return : none
-; modify: RCX
-;--------------------------------------------------------------------
-verifyArgs:
-    mov rcx, [rsp + 8]      ; put number of parameters in the rcx register. note: [rsp] points to return address
-    cmp cl, REQUIRED_PARAM  ; compare cl with required number of parameters
-    jne wrong_args          ; change flow to end, in case the number of parameters is not correct
-    ret
-
-
-;--------------------------------------------------------------------
-; ascii2Natural
-; description: Convert ascii character to natural number
-; params : 
-;   RDI - Memory address for the character to be 'translated'
-; return : RAX - 'translated' natural number
-; modify: RDI, RSI e RAX
-;--------------------------------------------------------------------
-ascii2Natural:
-    mov al, [rdi]               ; move ascii character to al
-    cmp al, ROTATE_FACTOR_MIN   ; compare character with '0'
-    jb invalid_rotation         ; change flow to error if character is less
-    cmp al, ROTATE_FACTOR_MAX   ; compare character with '7'
-    ja invalid_rotation         ; change flow to error if character is larger
-    and al, 0x0F                ; apply mask to isolate required bits (translation) 
-    ret
-
-
-;--------------------------------------------------------------------
-; error messages
-;--------------------------------------------------------------------
-invalid_rotation:
-    mov rdi, errMsgNumberOfRotates
-    call printStrLn
-    call terminate
-
-wrong_args:
-    mov rdi, errMsgNumberOfParams
-    call printStrLn
-    call terminate
